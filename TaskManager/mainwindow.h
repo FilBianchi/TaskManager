@@ -7,7 +7,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-class QTreeWidgetItem;
+class TreeModel;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -17,15 +17,21 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_treeWidget_customContextMenuRequested(const QPoint &pos);
 
     void on_actionAdd_Task_triggered();
 
     void on_actionRemove_Task_triggered();
 
-    void on_treeWidget_itemChanged(QTreeWidgetItem *item, int column);
+    void on_savePushButton_clicked();
+
+    void on_treeView_customContextMenuRequested(const QPoint &pos);
 
 private:
+
+    QPoint m_actionPos;
+
     Ui::MainWindow *ui;
+    TreeModel *m_model;
+
 };
 #endif // MAINWINDOW_H

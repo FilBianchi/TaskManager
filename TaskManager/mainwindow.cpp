@@ -1,55 +1,33 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QMenu>
-#include <QTreeWidgetItem>
+#include <treemodel.h>
+#include <task.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_model(new TreeModel(this))
 {
     ui->setupUi(this);
+    ui->treeView->setModel(m_model);
 
     this->setWindowFlags(Qt::WindowStaysOnTopHint);
+
+    m_model->insertColumn(0);
+    m_model->setHeaderData(0, Qt::Horizontal, "Name");
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
-}
 
-void MainWindow::on_treeWidget_customContextMenuRequested(const QPoint &pos)
-{
-    QMenu menu(this);
-
-    menu.addAction(ui->actionAdd_Task);
-    menu.addAction(ui->actionRemove_Task);
-
-    menu.exec(ui->treeWidget->mapToGlobal(pos));
 }
 
 void MainWindow::on_actionAdd_Task_triggered()
 {
-    QPoint globalPos = QCursor::pos();
-    QPoint localPos = ui->treeWidget->viewport()->mapFromGlobal(globalPos);
+    QModelIndex idx = ui->treeView->indexAt(m_actionPos);
 
-    QTreeWidgetItem *item = ui->treeWidget->itemAt(localPos);
-
-    QTreeWidgetItem *newItem = new QTreeWidgetItem();
-    newItem->setFlags(Qt::ItemIsDragEnabled |
-                      Qt::ItemIsDropEnabled |
-                      Qt::ItemIsEditable |
-                      Qt::ItemIsEnabled |
-                      Qt::ItemIsSelectable);
-
-    if (item == nullptr)
-    {
-        ui->treeWidget->addTopLevelItem(newItem);
-    }
-    else
-    {
-        item->addChild(newItem);
-    }
+    m_model->insertRows(0, 1, idx);
 }
 
 void MainWindow::on_actionRemove_Task_triggered()
@@ -57,7 +35,17 @@ void MainWindow::on_actionRemove_Task_triggered()
 
 }
 
-void MainWindow::on_treeWidget_itemChanged(QTreeWidgetItem *item, int column)
+void MainWindow::on_savePushButton_clicked()
 {
+}
 
+void MainWindow::on_treeView_customContextMenuRequested(const QPoint &pos)
+{
+    QMenu menu(this);
+
+    menu.addAction(ui->actionAdd_Task);
+    menu.addAction(ui->actionRemove_Task);
+
+    m_actionPos = pos;
+    menu.exec(ui->treeView->viewport()->mapToGlobal(pos));
 }
